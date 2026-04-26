@@ -23,6 +23,23 @@ import { and, desc, eq, gte, lte, ilike, or, sql, ne } from "drizzle-orm";
 
 const router: IRouter = Router();
 
+router.get("/me/reports", async (req, res, next) => {
+  try {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
+    const rows = await db
+      .select()
+      .from(reportsTable)
+      .where(eq(reportsTable.userId, req.user.id))
+      .orderBy(desc(reportsTable.createdAt));
+    res.json(rows.map(serializeReport));
+  } catch (err) {
+    next(err);
+  }
+});
+
 type ReportRow = typeof reportsTable.$inferSelect;
 
 function serializeReport(r: ReportRow) {
@@ -166,6 +183,7 @@ router.post("/reports", async (req, res, next) => {
         contactEmail: body.contactEmail ?? null,
         photoUrl: body.photoUrl ?? null,
         reward: body.reward ?? null,
+        userId: req.isAuthenticated() ? req.user.id : null,
       })
       .returning();
 

@@ -1,10 +1,28 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { MapPin, Search } from "lucide-react";
+import { MapPin, LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { useAuth } from "@workspace/replit-auth-web";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const { user, isAuthenticated, isLoading, login, logout } = useAuth();
+  const displayName =
+    user?.firstName || user?.email?.split("@")[0] || "Account";
+  const initial = (
+    user?.firstName?.[0] ||
+    user?.email?.[0] ||
+    "U"
+  ).toUpperCase();
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -53,6 +71,60 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 I found something
               </Button>
             </Link>
+            {isLoading ? (
+              <div className="h-9 w-9 rounded-full bg-secondary animate-pulse" />
+            ) : isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                    <Avatar className="h-9 w-9 border border-border">
+                      {user?.profileImageUrl ? (
+                        <AvatarImage src={user.profileImageUrl} alt={displayName} />
+                      ) : null}
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {initial}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col">
+                      <span className="font-medium truncate">{displayName}</span>
+                      {user?.email ? (
+                        <span className="text-xs text-muted-foreground truncate">
+                          {user.email}
+                        </span>
+                      ) : null}
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/my-reports" className="cursor-pointer">
+                      <UserIcon className="mr-2 h-4 w-4" />
+                      My Reports
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={logout}
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={login}
+                className="hidden sm:inline-flex"
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Log in
+              </Button>
+            )}
           </div>
         </div>
       </header>

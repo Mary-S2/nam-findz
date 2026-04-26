@@ -21,7 +21,14 @@ OpenAPI-first contract → generated types/Zod/React hooks. React + Vite fronten
 - `/reports/:id` — Detail view with status updates, AI match suggestions, secure messaging thread, flag-as-suspicious dialog.
 - `/report/lost`, `/report/found` — Report submission form.
 - `/dashboard` — Recharts visualizations (bar + pie) and recent activity timeline.
+- `/my-reports` — Authenticated user's own reports.
 - `/about` — Static info page.
+
+### Authentication
+- Replit Auth (OpenID Connect with PKCE). Tables: `sessions`, `users` in `lib/db/src/schema/auth.ts`.
+- Server: `artifacts/api-server/src/middlewares/authMiddleware.ts` + `routes/auth.ts` mount `/api/auth/*`.
+- Client: `lib/replit-auth-web` (`useAuth()` hook). Layout shows avatar dropdown when logged in, generic "Log in" button otherwise.
+- Reports created while signed in are linked via `reports.userId` (nullable, set null on user delete). `GET /api/me/reports` returns the caller's own reports.
 
 ### Backend features
 - Reports CRUD with filters (`kind`, `status`, `documentType`, `location`, `query`, `dateFrom`, `dateTo`).

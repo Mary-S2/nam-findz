@@ -5,7 +5,9 @@ import {
   timestamp,
   date,
   integer,
+  varchar,
 } from "drizzle-orm/pg-core";
+import { usersTable } from "./auth";
 
 export const reportsTable = pgTable("reports", {
   id: serial("id").primaryKey(),
@@ -23,6 +25,9 @@ export const reportsTable = pgTable("reports", {
   photoUrl: text("photo_url"),
   reward: text("reward"),
   flagCount: integer("flag_count").notNull().default(0),
+  userId: varchar("user_id").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
