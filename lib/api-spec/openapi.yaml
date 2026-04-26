@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: namFindz — Lost & Found / Missing Documents Portal API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: reports
+    description: Lost and found reports
+  - name: messages
+    description: Secure in-platform messaging
+  - name: stats
+    description: Dashboard summaries and analytics
+  - name: meta
+    description: Reference data (document types, locations)
 paths:
   /healthz:
     get:
@@ -24,6 +32,292 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List or search reports
+      parameters:
+        - in: query
+          name: kind
+          schema:
+            $ref: "#/components/schemas/ReportKind"
+        - in: query
+          name: status
+          schema:
+            $ref: "#/components/schemas/ReportStatus"
+        - in: query
+          name: documentType
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: Free-text search across name, item details, and location
+          schema:
+            type: string
+        - in: query
+          name: location
+          schema:
+            type: string
+        - in: query
+          name: dateFrom
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: dateTo
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+    post:
+      operationId: createReport
+      tags: [reports]
+      summary: Create a lost or found report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReportInput"
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+
+  /reports/{id}:
+    get:
+      operationId: getReport
+      tags: [reports]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportDetail"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateReportStatus
+      tags: [reports]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: "#/components/schemas/ReportStatus"
+              required: [status]
+      responses:
+        "200":
+          description: Updated report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+
+  /reports/{id}/matches:
+    get:
+      operationId: getMatchSuggestions
+      tags: [reports]
+      summary: AI-powered match suggestions for a report
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suggested matches with similarity scores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MatchSuggestion"
+
+  /reports/{id}/flag:
+    post:
+      operationId: flagReport
+      tags: [reports]
+      summary: Flag a report as suspicious or duplicate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+              required: [reason]
+      responses:
+        "200":
+          description: Flagged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /reports/{id}/messages:
+    get:
+      operationId: listMessages
+      tags: [messages]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Messages thread for a report
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                authorName:
+                  type: string
+                body:
+                  type: string
+              required: [authorName, body]
+      responses:
+        "201":
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /stats/summary:
+    get:
+      operationId: getStatsSummary
+      tags: [stats]
+      summary: Headline stats for the homepage and dashboard
+      responses:
+        "200":
+          description: Stats summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsSummary"
+
+  /stats/recent:
+    get:
+      operationId: getRecentActivity
+      tags: [stats]
+      summary: Recent successful matches and recoveries
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /stats/by-document-type:
+    get:
+      operationId: getReportsByDocumentType
+      tags: [stats]
+      summary: Counts of active reports grouped by document type
+      responses:
+        "200":
+          description: Counts grouped by document type
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentTypeCount"
+
+  /meta/document-types:
+    get:
+      operationId: listDocumentTypes
+      tags: [meta]
+      summary: Supported document and item types
+      responses:
+        "200":
+          description: List of document types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentType"
+
+  /meta/locations:
+    get:
+      operationId: listLocations
+      tags: [meta]
+      summary: Frequently used locations from existing reports
+      responses:
+        "200":
+          description: List of locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +328,207 @@ components:
       required:
         - status
 
+    ReportKind:
+      type: string
+      enum: [lost, found]
+
+    ReportStatus:
+      type: string
+      enum: [active, matched, under_review, claimed, closed]
+
+    DocumentType:
+      type: object
+      properties:
+        slug:
+          type: string
+        label:
+          type: string
+      required: [slug, label]
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+        kind:
+          $ref: "#/components/schemas/ReportKind"
+        status:
+          $ref: "#/components/schemas/ReportStatus"
+        documentType:
+          type: string
+        title:
+          type: string
+        nameOnDocument:
+          type: string
+          nullable: true
+        description:
+          type: string
+        location:
+          type: string
+        eventDate:
+          type: string
+          format: date
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+          nullable: true
+        contactEmail:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        reward:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - kind
+        - status
+        - documentType
+        - title
+        - description
+        - location
+        - eventDate
+        - contactName
+        - createdAt
+
+    ReportDetail:
+      allOf:
+        - $ref: "#/components/schemas/Report"
+        - type: object
+          properties:
+            messageCount:
+              type: integer
+            suggestedMatches:
+              type: array
+              items:
+                $ref: "#/components/schemas/MatchSuggestion"
+          required: [messageCount, suggestedMatches]
+
+    CreateReportInput:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/ReportKind"
+        documentType:
+          type: string
+        title:
+          type: string
+        nameOnDocument:
+          type: string
+          nullable: true
+        description:
+          type: string
+        location:
+          type: string
+        eventDate:
+          type: string
+          format: date
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+          nullable: true
+        contactEmail:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        reward:
+          type: string
+          nullable: true
+      required:
+        - kind
+        - documentType
+        - title
+        - description
+        - location
+        - eventDate
+        - contactName
+
+    MatchSuggestion:
+      type: object
+      properties:
+        report:
+          $ref: "#/components/schemas/Report"
+        score:
+          type: number
+          description: Similarity score 0..1
+        reason:
+          type: string
+      required: [report, score, reason]
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        reportId:
+          type: integer
+        authorName:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, reportId, authorName, body, createdAt]
+
+    StatsSummary:
+      type: object
+      properties:
+        totalReports:
+          type: integer
+        activeLost:
+          type: integer
+        activeFound:
+          type: integer
+        successfulRecoveries:
+          type: integer
+        recoveryRate:
+          type: number
+          description: Percentage 0..100
+      required:
+        - totalReports
+        - activeLost
+        - activeFound
+        - successfulRecoveries
+        - recoveryRate
+
+    DocumentTypeCount:
+      type: object
+      properties:
+        documentType:
+          type: string
+        label:
+          type: string
+        lostCount:
+          type: integer
+        foundCount:
+          type: integer
+      required: [documentType, label, lostCount, foundCount]
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        kind:
+          type: string
+          enum: [match, recovery, new_report]
+        title:
+          type: string
+        documentType:
+          type: string
+        location:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      required: [id, kind, title, documentType, location, timestamp]

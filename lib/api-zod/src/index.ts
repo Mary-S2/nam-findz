@@ -1,2 +1,17 @@
 export * from "./generated/api";
-export * from "./generated/types";
+
+export type { ActivityItem } from "./generated/types/activityItem";
+export type { ActivityItemKind } from "./generated/types/activityItemKind";
+export type { CreateReportInput } from "./generated/types/createReportInput";
+export type { DocumentType } from "./generated/types/documentType";
+export type { DocumentTypeCount } from "./generated/types/documentTypeCount";
+export type { FlagReport200 } from "./generated/types/flagReport200";
+export type { HealthStatus } from "./generated/types/healthStatus";
+export type { ListReportsParams } from "./generated/types/listReportsParams";
+export type { MatchSuggestion } from "./generated/types/matchSuggestion";
+export type { Message } from "./generated/types/message";
+export type { Report } from "./generated/types/report";
+export type { ReportDetail } from "./generated/types/reportDetail";
+export type { ReportKind } from "./generated/types/reportKind";
+export type { ReportStatus } from "./generated/types/reportStatus";
+export type { StatsSummary } from "./generated/types/statsSummary";
