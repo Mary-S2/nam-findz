@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { MapPin, LogIn, LogOut, User as UserIcon } from "lucide-react";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@workspace/auth-web";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const { user, isAuthenticated, isLoading, login, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const displayName =
     user?.firstName || user?.email?.split("@")[0] || "Account";
   const initial = (
@@ -78,9 +78,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <DropdownMenuTrigger asChild>
                   <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                     <Avatar className="h-9 w-9 border border-border">
-                      {user?.profileImageUrl ? (
-                        <AvatarImage src={user.profileImageUrl} alt={displayName} />
-                      ) : null}
                       <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                         {initial}
                       </AvatarFallback>
@@ -116,14 +113,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button
-                variant="ghost"
-                onClick={login}
-                className="hidden sm:inline-flex"
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                Log in
-              </Button>
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  className="hidden sm:inline-flex"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Log in
+                </Button>
+              </Link>
             )}
           </div>
         </div>

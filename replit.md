@@ -25,10 +25,13 @@ OpenAPI-first contract → generated types/Zod/React hooks. React + Vite fronten
 - `/about` — Static info page.
 
 ### Authentication
-- Replit Auth (OpenID Connect with PKCE). Tables: `sessions`, `users` in `lib/db/src/schema/auth.ts`.
-- Server: `artifacts/api-server/src/middlewares/authMiddleware.ts` + `routes/auth.ts` mount `/api/auth/*`.
-- Client: `lib/replit-auth-web` (`useAuth()` hook). Layout shows avatar dropdown when logged in, generic "Log in" button otherwise.
+- Email + password auth with bcryptjs hashing and a server-side session table (`sessions`, `users` in `lib/db/src/schema/auth.ts`). Session cookie `sid`, 7-day TTL. `secure` flag only set when `NODE_ENV==="production"`.
+- Server: `artifacts/api-server/src/lib/auth.ts` (session helpers), `middlewares/authMiddleware.ts`, `routes/auth.ts` mounted at `/api/auth/*` — endpoints: `POST /register`, `POST /login`, `POST /logout`, `GET /user`.
+- Client: `lib/auth-web` (`@workspace/auth-web`) exposes `useAuth()` returning `{ user, isLoading, isAuthenticated, refresh, logout }`. Pages `/login` and `/register` are wired in `App.tsx`.
 - Reports created while signed in are linked via `reports.userId` (nullable, set null on user delete). `GET /api/me/reports` returns the caller's own reports.
+
+### Self-hosting (Render + Neon)
+- `scripts/src/export-data.ts` (run via `pnpm --filter @workspace/scripts run export-data`) writes `database-export.sql` containing TRUNCATE + INSERT statements for all tables. Run it after `pnpm --filter @workspace/db run push` on the new database to load seed data.
 
 ### Backend features
 - Reports CRUD with filters (`kind`, `status`, `documentType`, `location`, `query`, `dateFrom`, `dateTo`).

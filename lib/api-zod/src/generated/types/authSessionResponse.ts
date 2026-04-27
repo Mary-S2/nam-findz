@@ -5,10 +5,8 @@
  * namFindz — Lost & Found / Missing Documents Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { AuthUser } from "./authUser";
 
-export type BeginBrowserLoginParams = {
-  /**
-   * Relative path to redirect to after login (must start with `/`). Defaults to `/`.
-   */
-  returnTo?: string;
-};
+export interface AuthSessionResponse {
+  user: AuthUser;
+}

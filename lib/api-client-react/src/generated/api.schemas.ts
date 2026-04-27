@@ -7,41 +7,54 @@
  */
 export interface AuthUser {
   id: string;
-  /** @nullable */
-  email: string | null;
+  email: string;
   /** @nullable */
   firstName: string | null;
   /** @nullable */
   lastName: string | null;
-  /** @nullable */
-  profileImageUrl: string | null;
 }
 
 export interface AuthUserEnvelope {
   user: AuthUser | null;
 }
 
-export interface MobileTokenExchangeRequest {
-  /** @minLength 1 */
-  code: string;
-  /** @minLength 1 */
-  code_verifier: string;
-  /** @minLength 1 */
-  redirect_uri: string;
-  /** @minLength 1 */
-  state: string;
-  /** @minLength 1 */
-  nonce?: string;
+export interface RegisterUserBody {
+  /**
+   * @minLength 3
+   * @maxLength 254
+   */
+  email: string;
+  /**
+   * @minLength 8
+   * @maxLength 128
+   */
+  password: string;
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  firstName?: string;
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  lastName?: string;
 }
 
-export interface MobileTokenExchangeSuccess {
-  token: string;
+export interface LoginUserBody {
+  email: string;
+  /** @minLength 1 */
+  password: string;
 }
 
-export const LogoutSuccessValue = {
+export interface AuthSessionResponse {
+  user: AuthUser;
+}
+
+export const LogoutSessionResponseValue = {
   success: true,
 } as const;
-export type LogoutSuccess = typeof LogoutSuccessValue;
+export type LogoutSessionResponse = typeof LogoutSessionResponseValue;
 
 export interface ErrorEnvelope {
   error: string;
@@ -164,19 +177,6 @@ export interface ActivityItem {
  * Opaque session token — `Bearer <sid>`.
  */
 export type AuthorizationSessionHeaderParameter = string;
-
-export type BeginBrowserLoginParams = {
-  /**
-   * Relative path to redirect to after login (must start with `/`). Defaults to `/`.
-   */
-  returnTo?: string;
-};
-
-export type HandleBrowserLoginCallbackParams = {
-  code?: string;
-  state?: string;
-  iss?: string;
-};
 
 export type ListReportsParams = {
   kind?: ReportKind;

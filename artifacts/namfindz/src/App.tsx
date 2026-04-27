@@ -12,6 +12,8 @@ import ReportDetail from "@/pages/report-detail";
 import Dashboard from "@/pages/dashboard";
 import About from "@/pages/about";
 import MyReports from "@/pages/my-reports";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -37,6 +39,8 @@ function Router() {
       <Route path="/reports/:id" component={ReportDetail} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/my-reports" component={MyReports} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>

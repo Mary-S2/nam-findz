@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { FileText, LogIn, Plus } from "lucide-react";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@workspace/auth-web";
 import {
   useListMyReports,
   getListMyReportsQueryKey,
@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ReportCard } from "@/components/report-card";
 
 export default function MyReports() {
-  const { isAuthenticated, isLoading: isAuthLoading, login, user } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
   const { data: reports, isLoading } = useListMyReports({
     query: {
       enabled: isAuthenticated,
@@ -48,11 +48,18 @@ export default function MyReports() {
               manage your messages in one place.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button onClick={login} size="lg" className="mt-2">
-              <LogIn className="mr-2 h-4 w-4" />
-              Log in
-            </Button>
+          <CardContent className="flex justify-center gap-2">
+            <Link href="/login">
+              <Button size="lg" className="mt-2">
+                <LogIn className="mr-2 h-4 w-4" />
+                Log in
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size="lg" variant="outline" className="mt-2">
+                Create account
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

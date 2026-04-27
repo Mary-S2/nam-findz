@@ -6,7 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export const LogoutSuccessValue = {
+export const LogoutSessionResponseValue = {
   success: true,
 } as const;
-export type LogoutSuccess = typeof LogoutSuccessValue;
+export type LogoutSessionResponse = typeof LogoutSessionResponseValue;

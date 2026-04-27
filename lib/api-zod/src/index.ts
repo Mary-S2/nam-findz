@@ -17,7 +17,5 @@ export type { ReportStatus } from "./generated/types/reportStatus";
 export type { StatsSummary } from "./generated/types/statsSummary";
 export type { AuthUser } from "./generated/types/authUser";
 export type { AuthUserEnvelope } from "./generated/types/authUserEnvelope";
-export type { MobileTokenExchangeRequest } from "./generated/types/mobileTokenExchangeRequest";
-export type { MobileTokenExchangeSuccess } from "./generated/types/mobileTokenExchangeSuccess";
-export type { LogoutSuccess } from "./generated/types/logoutSuccess";
+export type { AuthSessionResponse } from "./generated/types/authSessionResponse";
 export type { ErrorEnvelope } from "./generated/types/errorEnvelope";
