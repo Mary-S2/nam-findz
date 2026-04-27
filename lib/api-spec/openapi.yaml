@@ -109,6 +109,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LogoutSessionResponse'
+  /auth/request-password-reset:
+    post:
+      tags: [Auth]
+      operationId: requestPasswordReset
+      summary: Request a password reset link by email
+      description: Always returns success to prevent account enumeration. If the email exists, a reset link is sent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPasswordResetBody'
+      responses:
+        '200':
+          description: Reset request accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetRequestResponse'
+        '400':
+          description: Invalid email.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      operationId: resetPassword
+      summary: Set a new password using a reset token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordBody'
+      responses:
+        '200':
+          description: Password updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetCompleteResponse'
+        '400':
+          description: Invalid or expired token, or invalid password.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
   /healthz:
     get:
       operationId: healthCheck
@@ -507,6 +556,41 @@ components:
         user:
           $ref: '#/components/schemas/AuthUser'
     LogoutSessionResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          const: true
+    RequestPasswordResetBody:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 254
+    PasswordResetRequestResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          const: true
+    ResetPasswordBody:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+          minLength: 16
+          maxLength: 256
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+    PasswordResetCompleteResponse:
       type: object
       required: [success]
       properties:

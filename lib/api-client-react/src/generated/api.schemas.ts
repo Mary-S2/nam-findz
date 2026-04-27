@@ -56,6 +56,39 @@ export const LogoutSessionResponseValue = {
 } as const;
 export type LogoutSessionResponse = typeof LogoutSessionResponseValue;
 
+export interface RequestPasswordResetBody {
+  /**
+   * @minLength 3
+   * @maxLength 254
+   */
+  email: string;
+}
+
+export const PasswordResetRequestResponseValue = {
+  success: true,
+} as const;
+export type PasswordResetRequestResponse =
+  typeof PasswordResetRequestResponseValue;
+
+export interface ResetPasswordBody {
+  /**
+   * @minLength 16
+   * @maxLength 256
+   */
+  token: string;
+  /**
+   * @minLength 8
+   * @maxLength 128
+   */
+  password: string;
+}
+
+export const PasswordResetCompleteResponseValue = {
+  success: true,
+} as const;
+export type PasswordResetCompleteResponse =
+  typeof PasswordResetCompleteResponseValue;
+
 export interface ErrorEnvelope {
   error: string;
 }

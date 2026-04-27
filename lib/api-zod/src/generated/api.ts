@@ -75,6 +75,49 @@ export const LogoutSessionResponse = zod.object({
 });
 
 /**
+ * Always returns success to prevent account enumeration. If the email exists, a reset link is sent.
+ * @summary Request a password reset link by email
+ */
+export const requestPasswordResetBodyEmailMin = 3;
+export const requestPasswordResetBodyEmailMax = 254;
+
+export const RequestPasswordResetBody = zod.object({
+  email: zod
+    .string()
+    .email()
+    .min(requestPasswordResetBodyEmailMin)
+    .max(requestPasswordResetBodyEmailMax),
+});
+
+export const RequestPasswordResetResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Set a new password using a reset token
+ */
+export const resetPasswordBodyTokenMin = 16;
+export const resetPasswordBodyTokenMax = 256;
+
+export const resetPasswordBodyPasswordMin = 8;
+export const resetPasswordBodyPasswordMax = 128;
+
+export const ResetPasswordBody = zod.object({
+  token: zod
+    .string()
+    .min(resetPasswordBodyTokenMin)
+    .max(resetPasswordBodyTokenMax),
+  password: zod
+    .string()
+    .min(resetPasswordBodyPasswordMin)
+    .max(resetPasswordBodyPasswordMax),
+});
+
+export const ResetPasswordResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
  * Returns server health status
  * @summary Health check
  */

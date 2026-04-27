@@ -25,9 +25,12 @@ OpenAPI-first contract → generated types/Zod/React hooks. React + Vite fronten
 - `/about` — Static info page.
 
 ### Authentication
-- Email + password auth with bcryptjs hashing and a server-side session table (`sessions`, `users` in `lib/db/src/schema/auth.ts`). Session cookie `sid`, 7-day TTL. `secure` flag only set when `NODE_ENV==="production"`.
-- Server: `artifacts/api-server/src/lib/auth.ts` (session helpers), `middlewares/authMiddleware.ts`, `routes/auth.ts` mounted at `/api/auth/*` — endpoints: `POST /register`, `POST /login`, `POST /logout`, `GET /user`.
-- Client: `lib/auth-web` (`@workspace/auth-web`) exposes `useAuth()` returning `{ user, isLoading, isAuthenticated, refresh, logout }`. Pages `/login` and `/register` are wired in `App.tsx`.
+- Email + password auth with bcryptjs hashing and a server-side session table (`sessions`, `users`, `password_reset_tokens` in `lib/db/src/schema/auth.ts`). Session cookie `sid`, 7-day TTL. `secure` flag only set when `NODE_ENV==="production"`.
+- Server: `artifacts/api-server/src/lib/auth.ts` (session helpers), `lib/email.ts` (SMTP via nodemailer), `middlewares/authMiddleware.ts`, `routes/auth.ts` mounted at `/api/auth/*`.
+- Endpoints: `POST /register`, `POST /login`, `POST /logout`, `GET /user`, `POST /request-password-reset`, `POST /reset-password`.
+- Password reset: 1-hour TTL, single-use tokens stored as sha256 hashes. Request endpoint always returns `{success:true}` to prevent account enumeration. Reset URL = `${APP_ORIGIN}/reset-password?token=...` (falls back to `x-forwarded-*`/host headers when `APP_ORIGIN` is unset).
+- Email delivery: configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (and optional `EMAIL_FROM`). With no SMTP env vars set, the email body is logged to stdout — useful for local development.
+- Client: `lib/auth-web` (`@workspace/auth-web`) exposes `useAuth()` returning `{ user, isLoading, isAuthenticated, refresh, logout }`. Pages `/login`, `/register`, `/forgot-password`, `/reset-password` are wired in `App.tsx`.
 - Reports created while signed in are linked via `reports.userId` (nullable, set null on user delete). `GET /api/me/reports` returns the caller's own reports.
 
 ### Self-hosting (Render + Neon)

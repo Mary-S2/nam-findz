@@ -14,6 +14,8 @@ import About from "@/pages/about";
 import MyReports from "@/pages/my-reports";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -41,6 +43,8 @@ function Router() {
       <Route path="/my-reports" component={MyReports} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>
