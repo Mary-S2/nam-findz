@@ -27,8 +27,7 @@ app.use(
     },
   }),
 );
-app.use(cors({ credentials: true, origin: true }));
-app.use(cookieParser());
+app.use(cors({ credentials: true, origin: 'https://nam-findz-frontend.onrender.com' }));app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(authMiddleware);
