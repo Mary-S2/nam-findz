@@ -12,11 +12,11 @@ services:
       - key: SESSION_SECRET
         sync: false
 
-  - type: web
+ - type: web
     name: nam-findz-frontend
     runtime: static
     buildCommand: npx pnpm install && npx pnpm --filter @workspace/namfindz run build
     staticPublishPath: artifacts/namfindz/dist
     envVars:
       - key: VITE_API_URL
-        sync: false
+        value: https://nam-findz-api.onrender.com
