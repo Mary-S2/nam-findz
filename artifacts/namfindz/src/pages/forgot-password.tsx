@@ -25,7 +25,7 @@ export default function ForgotPassword() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch(${import.meta.env.VITE_API_URL ?? ""}/api/auth/request-password-reset, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL ?? ""}/api/auth/request-password-reset`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
