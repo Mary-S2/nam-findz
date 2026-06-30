@@ -1,30 +1,3 @@
-import nodemailer, { type Transporter } from "nodemailer";
-
-let cachedTransport: Transporter | null = null;
-
-function getTransport(): Transporter | null {
-  if (cachedTransport) return cachedTransport;
-
-  const host = process.env.SMTP_HOST;
-  const port = process.env.SMTP_PORT
-    ? Number(process.env.SMTP_PORT)
-    : undefined;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (!host || !port || !user || !pass) {
-    return null;
-  }
-
-  cachedTransport = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
-  return cachedTransport;
-}
-
 export interface SendEmailArgs {
   to: string;
   subject: string;
@@ -33,24 +6,35 @@ export interface SendEmailArgs {
 }
 
 export async function sendEmail(args: SendEmailArgs): Promise<void> {
-  const transport = getTransport();
-  const from =
-    process.env.EMAIL_FROM ?? "namFindz <no-reply@namfindz.local>";
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM ?? "namFindz <onboarding@resend.dev>";
 
-  if (!transport) {
+  if (!apiKey) {
     console.log(
-      `[email] SMTP not configured. Would send to ${args.to}\n  Subject: ${args.subject}\n  Body: ${args.text}`,
+      `[email] RESEND_API_KEY not configured. Would send to ${args.to}\n  Subject: ${args.subject}\n  Body: ${args.text}`,
     );
     return;
   }
 
-  await transport.sendMail({
-    from,
-    to: args.to,
-    subject: args.subject,
-    text: args.text,
-    html: args.html,
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: args.to,
+      subject: args.subject,
+      text: args.text,
+      html: args.html,
+    }),
   });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`Resend API error: ${res.status} ${errText}`);
+  }
 }
 
 export function buildPasswordResetEmail(args: {
