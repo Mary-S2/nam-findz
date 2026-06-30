@@ -1,16 +1,16 @@
 services:
-  - type: web
-    name: nam-findz-api
-    runtime: node
-    buildCommand: npx pnpm install && npx pnpm --filter @workspace/api-server run build
-    startCommand: node artifacts/api-server/dist/index.mjs
+- type: web
+    name: nam-findz-frontend
+    runtime: static
+    buildCommand: npx pnpm install && npx pnpm --filter @workspace/namfindz run build
+    staticPublishPath: artifacts/namfindz/dist
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        sync: false
-      - key: SESSION_SECRET
-        sync: false
+      - key: VITE_API_URL
+        value: https://nam-findz-api.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
 
  - type: web
     name: nam-findz-frontend
